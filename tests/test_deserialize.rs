@@ -1,3 +1,4 @@
+#[macro_use] extern crate serde_derive;
 extern crate serde_urlencoded;
 
 #[test]
@@ -31,4 +32,20 @@ fn deserialize_option() {
         ("last".to_owned(), Some(42)),
     ];
     assert_eq!(serde_urlencoded::from_str("first=23&last=42"), Ok(result));
+}
+
+#[derive(Eq, PartialEq, Debug, Deserialize)]
+struct Newtype(String);
+
+#[derive(Eq, PartialEq, Debug, Deserialize)]
+struct NewtypeContainer {
+    newtype: Newtype,
+}
+
+#[test]
+fn deserialize_newtype() {
+    assert_eq!(serde_urlencoded::from_str("newtype=foobar"),
+               Ok(NewtypeContainer{
+                   newtype: Newtype("foobar".to_string()),
+               }));
 }
